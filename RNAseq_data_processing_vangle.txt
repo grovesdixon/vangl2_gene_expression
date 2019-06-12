@@ -1,0 +1,242 @@
+#RNA-seq data processing for vangle data
+#3-19-19
+
+########################################
+#### DOWNLOAD READS FROM BASE-SPACE ####
+########################################
+#(see downloading_NGS_data_from_GSAF.txt for more on this)
+bs download project -i 122413294 -o JA19052_download
+
+#move fastqs into single directory
+mkdir fastqs
+for dir in ls -d JA19052_download/*/
+do echo "mv ${dir}*.gz fastqs/"
+done
+
+
+#check reads
+ls *.gz | wc -l
+	#288 = 36 samples * 2 pe * 4 lane duplicates
+
+ll *L001_R1_001.fastq | wc -l
+	#36
+
+
+#gunzip them
+
+ls *.fastq | wc -l
+#288
+
+ls *001.fastq | wc -l
+#288
+
+rename _001.fastq .fastq *_001.fastq
+
+
+	
+
+########################################
+############### TRIMMING ###############
+########################################
+
+>trimpe
+for file in *_R2.fastq
+do echo "cutadapt \
+-a GATCGGAAGAGCA \
+-A GATCGGAAGAGCA \
+-a AGATCGGAAGAGC \
+-A AGATCGGAAGAGC \
+--minimum-length 20 \
+-q 20 \
+-o ${file/_R2.fastq/}_R1.trim \
+-p ${file/_R2.fastq/}_R2.trim \
+${file/_R2.fastq/}_R1.fastq \
+$file > ${file}_trimlog.txt" >> trimpe
+done
+
+
+launcher_creator.py -n trimpe -j trimpe -a $allo -e $email -q normal -t 8:00:00 -N 1 -w 144
+sbatch trimpe.slurm
+
+
+
+########################################
+################ MAPPING ###############
+########################################
+
+drerioStarGenomeDir="/work/02260/grovesd/stampede2/drerio_ensemble_ref_v10"
+
+>starMapping
+for file in *L001_R1.trim
+do L1_R1=$file
+L2_R1=${L1_R1/_L001_/_L002_}
+L3_R1=${L1_R1/_L001_/_L003_}
+L4_R1=${L1_R1/_L001_/_L004_}
+L1_R2=${file/_R1.trim/_R2.trim}
+L2_R2=${L1_R2/_L001_/_L002_}
+L3_R2=${L1_R2/_L001_/_L003_}
+L4_R2=${L1_R2/_L001_/_L004_}
+echo STAR --runMode alignReads\
+ --runThreadN 1\
+ --outFileNamePrefix ${file/L001_R1.trim}\
+ --outReadsUnmapped Fastx\
+ --outSAMtype BAM Unsorted\
+ --genomeDir $drerioStarGenomeDir\
+ --readFilesIn $L1_R1,$L2_R1,$L3_R1,$L4_R1 $L1_R2,$L2_R2,$L3_R2,$L4_R2 >> starMapping
+done
+
+
+launcher_creator.py -n starMapping -j starMapping -q normal -N 6 -w 6 -a $allo -e $email -t 12:00:00
+
+
+
+#########################################
+############# SORT AND DEDUP ############
+#########################################
+
+module load samtools
+>removeDups
+for file in *Aligned.out.bam
+do runID=${file/Aligned.out.bam/}
+ echo "samtools sort -O bam -o ${runID}_sorted.bam $file &&\
+ java -Xms4g -jar /work/02260/grovesd/lonestar/picard/picard-tools-1.119/MarkDuplicates.jar\
+ INPUT=${runID}_sorted.bam\
+ OUTPUT=${runID}_dupsRemoved.bam\
+ METRICS_FILE=${runID}_dupMetrics.txt\
+ REMOVE_DUPLICATES=true &&\
+ samtools sort -n -O bam -o ${runID}_dupsRemoved_NameSorted.bam  ${runID}_dupsRemoved.bam" >> removeDups
+done
+ 
+launcher_creator.py -n remZebDups -j removeDups -t 12:00:00 -q normal -a $allo -e $email -N 6 -w 2
+
+
+
+
+#########################################
+############### GET COUNTS ##############
+#########################################
+
+
+#Run in batch of three since max parallel is 64
+MY_GFF="/work/02260/grovesd/stampede2/drerio_ensemble_ref_v10/Danio_rerio.GRCz10.89.gtf"
+GENE_ID="gene_id"
+echo "/work/02260/grovesd/stampede2/subread-1.6.3-source/bin/featureCounts -a $MY_GFF -p -t gene -g $GENE_ID -o feature_counts_out.txt -T 64 --primary *_dupsRemoved_NameSorted.bam" > runFeatureCounts
+
+
+launcher_creator.py -n fetCountVangle -j runFeatureCounts -q normal -N 1 -w 1 -a $allo -e $email -t 8:00:00
+
+
+#remove junk from names
+sed -i.bak 's/_dupsRemoved_NameSorted.bam//g' feature_counts_out.txt
+sed -i.bak 's/_dupsRemoved_NameSorted.bam//g' feature_counts_out.txt.summary
+
+##########################################
+####### ASSEMBLE PIPELINE COUNTS #########
+##########################################
+
+
+wc -l *.fastq |\
+ awk '{split($2, a, "_")
+ print a[1]"\t"$1/4"\trawCounts"}' |\
+ grep -v total > raw_read_counts.tsv &
+
+
+
+
+#GET POST TRIMMING READ COUNT
+wc -l *.trim |\
+ awk '{split($2, a, "_")
+ print a[1]"\t"$1/4"\ttrimmedCounts"}' |\
+ grep -v total > trimmed_read_counts.tsv &
+
+
+
+
+#get alignment counts before removal
+>getInitialAlignment
+for file in *sorted.bam
+do echo "samtools flagstat $file > ${file/_sorted.bam/}_prededup_flagstats.txt" >> getInitialAlignment
+done
+
+#get post removal alignment counts
+>getDupRemAlignment
+for file in *dupsRemoved.bam
+do echo "samtools flagstat $file > ${file/.bam/}_post_dedup_flagstats.txt &" >> getDupRemAlignment
+done
+
+
+
+#format properly paired reads
+>prededup_properly_paired_count.tsv
+for file in *prededup_flagstats.txt
+do pp=$(grep "properly paired" $file); echo -e "$file\t$pp" |\
+ awk '{split($1, a, "_")
+ split($7, b, "(")
+ print a[1]"\t"$2"\tpredupPropPaired"}' >> prededup_properly_paired_count.tsv
+ done
+
+#format total reads
+>prededup_mapped_count.tsv
+for file in *prededup_flagstats.txt
+do pp=$(grep "mapped" $file | head -n 1)
+ echo -e "$file\t$pp" |\
+ awk '{split($1, a, "_")
+ print a[1]"\t"$2"\tpredupMapped"}' >> prededup_mapped_count.tsv
+ done
+
+
+#removal metrics
+>dupRemovalMetrics.tsv
+for file in *dupMetrics.txt
+do pct=$(sed '8q;d' $file | cut -f 8)
+echo -e "$file\t$pct" |\
+ awk '{split($1, a, "_")
+ print a[1]"\t"$2"\tdupRemProp"}' >> dupRemovalMetrics.tsv
+done
+
+
+#format properly paired reads
+>dedup_properly_paired_count.tsv
+for file in *_post_dedup_flagstats.txt
+do pp=$(grep "properly paired" $file)
+ echo -e "$file\t$pp" |\
+ awk '{split($1, a, "_")
+ print a[1]"\t"$2"\tdedupPropPair"}' >> dedup_properly_paired_count.tsv
+done
+
+#format total reads
+>dedup_mapped_count.tsv
+for file in *_post_dedup_flagstats.txt
+do pp=$(grep "mapped" $file | head -n 1)
+ echo -e "$file\t$pp" |\
+ awk '{split($1, a, "_")
+ print a[1]"\t"$2"\tdedupMapped"}' >> dedup_mapped_count.tsv
+ done
+ 
+ #format total gene counted by feature counts
+grep ^Status feature_counts_out.txt.summary | tr "\t" "\n" | grep -v Status | awk '{split($1, a, "_");print a[1]}' > samples0
+grep ^Assigned feature_counts_out.txt.summary | tr "\t" "\n" | grep -v Assigned > geneCounts0
+paste -d "\t" samples0 geneCounts0 | awk '{print $0"\tgeneCounted"}' > gene_counted.tsv
+ 
+
+
+#----- Pipeline step count files -----#
+dedup_mapped_count.tsv
+dedup_properly_paired_count.tsv
+dupRemovalMetrics.tsv
+gene_counted.tsv
+prededup_mapped_count.tsv
+prededup_properly_paired_count.tsv
+raw_read_counts.tsv
+trimmed_read_counts.tsv
+
+
+#Assemble
+cat *.tsv > all_pipeline_counts.txt
+
+
+
+
+
+
+

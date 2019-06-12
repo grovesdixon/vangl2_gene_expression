@@ -1,0 +1,13 @@
+#Analysis pipeline
+
+
+
+
+#once you have the featureCounts result file gene_counted.tsv, use these in series:
+
+1. initialize_feature_counts.R
+2. deseq_treatment_effects.R
+3. genes_for_links.R
+4. get_gene_names.R
+
+
