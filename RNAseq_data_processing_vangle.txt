@@ -236,7 +236,27 @@ cat *.tsv > all_pipeline_counts.txt
 
 
 
+#######################################
+################ WGCNA ################
+#######################################
+#select the input
+WGCNA_INPUT="wgcnaInput.Rdata"
 
+#get soft threshold
+echo "wgcna2_get_soft_threshold.R --input $WGCNA_INPUT --networkType signed" > getSoft
+
+
+#run
+echo "$runMyR ~/bin/wgcna3b_step-wise_network_construction.R \
+ --softPower 12\
+ --minSize 20\
+ --mergeCutoff 0\
+ --input $WGCNA_INPUT\
+ --nCores 24\
+ --networkType signed" > runWGCNA
+ 
+
+#optionally re-run with merging
 
 
 

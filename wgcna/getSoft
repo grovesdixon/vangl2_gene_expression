@@ -1,0 +1,1 @@
+wgcna2_get_soft_threshold.R --input wgcnaInput.Rdata --networkType signed

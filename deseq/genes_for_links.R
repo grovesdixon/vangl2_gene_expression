@@ -1,13 +1,13 @@
-#genes_for_clueICV.R
+#genes_for_links.R
 library("biomaRt")
 hsembl = useMart("ensembl", dataset="hsapiens_gene_ensembl") #get the human dataset
-setwd("/Users/grovesdixon/lab_files/projects/vangle_zebrafish")
-source('~/gitreps/zebrafish_early_ethanol_RNASeq/scripts/zebrafish_RNAseq_functions.R')
+source('rnaseq_functions.R')
 
 
 
 #read in ethanol DESEq results
-lnames=load('ethanol_results.Rdata')
+lnames=load('deseq/ethanol_results.Rdata');SET=''
+lnames=load('deseq/mutantOnly_ethanol_results.Rdata');SET='mutantOnly'
 head(res.eth)
 res.eth=res.eth[!is.na(res.eth$padj),]
 sdat=data.frame(res.eth[res.eth$padj<0.1,])
@@ -34,8 +34,10 @@ h.downGeneSet=get_human_ids(geneSet)
 h.upGeneSet[h.upGeneSet %in% h.downGeneSet]
 
 #write them out
-write.table(h.upGeneSet, "ethanol_significant_upregulated.txt", quote=F, row.names=F, col.names=F)
-write.table(h.downGeneSet, "ethanol_significant_downregulated.txt", quote=F, row.names=F, col.names=F)
+upOut = paste(c('results/', SET, 'ethanol_significant_upregulated.txt'), collapse='')
+downOut = paste(c('results/', SET, 'ethanol_significant_downregulated.txt'), collapse='')
+write.table(h.upGeneSet, upOut, quote=F, row.names=F, col.names=F)
+write.table(h.downGeneSet, downOut, quote=F, row.names=F, col.names=F)
 
 
 

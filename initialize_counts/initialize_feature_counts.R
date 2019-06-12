@@ -48,7 +48,7 @@ coldata=tibble(
                    'ethanol',
                    'control')),
   Genotype=factor(if_else(grepl('M', sample),
-                   'mutatnt',
+                   'mutant',
                    'het_wt')),
   Batch = factor(if_else(sampleNum < 4,
                  1,
@@ -208,6 +208,7 @@ coldata=coldata[!coldata$sample %in% outlierNames,]
 save(counts, coldata, file="deseq/deseqInput.Rdata")
 save(rld.df, rld, file="initialize_counts/rld.Rdata")
 datTraits=coldata
+rownames(datTraits)=coldata$sample
 save(datExpr, datTraits, file="wgcna/wgcnaInput.Rdata")
 
 
