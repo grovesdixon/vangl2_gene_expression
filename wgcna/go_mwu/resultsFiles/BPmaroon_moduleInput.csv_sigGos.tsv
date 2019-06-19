@@ -1,0 +1,4 @@
+delta.rank	pval	level	nseqs	term	name	p.adj
+0	2.15285545944051e-6	2	182	GO:0007155;GO:0022610	cell adhesion	0.00233718809720357
+0	3.07727201738455e-6	3	620	GO:0007166	cell surface receptor signaling pathway	0.00233718809720357
+0	8.15318253104963e-6	2	158	GO:0007167	enzyme linked receptor protein signaling pathway	0.00412822808822146

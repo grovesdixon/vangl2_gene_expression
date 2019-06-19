@@ -248,9 +248,9 @@ echo "wgcna2_get_soft_threshold.R --input $WGCNA_INPUT --networkType signed" > g
 
 #run
 echo "$runMyR ~/bin/wgcna3b_step-wise_network_construction.R \
- --softPower 12\
+ --softPower 10\
  --minSize 20\
- --mergeCutoff 0\
+ --mergeCutoff 0.25\
  --input $WGCNA_INPUT\
  --nCores 24\
  --networkType signed" > runWGCNA

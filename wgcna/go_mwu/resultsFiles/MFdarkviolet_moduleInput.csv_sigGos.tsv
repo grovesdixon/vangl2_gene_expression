@@ -1,0 +1,7 @@
+delta.rank	pval	level	nseqs	term	name	p.adj
+0	3.92762705055228e-5	4	6	GO:0003689;GO:0033170	DNA clamp loader activity	0.00786834619127307
+0	9.66855763719658e-6	8	60	GO:0015078	hydrogen ion transmembrane transporter activity	0.00290540156997757
+0	9.53898442241379e-4	2	200	GO:0016887;GO:0042623	ATPase activity	0.0955488272978448
+0	8.36812608054309e-5	7	36	GO:0019829;GO:0042625	ATPase activity, coupled to transmembrane movement of ions	0.012573109436016
+0	3.13189901050429e-4	6	73	GO:0042626;GO:0015405;GO:0016820;GO:0043492;GO:0015399	ATPase activity, coupled to movement of substances	0.0376454261062616
+0	5.24990844571893e-6	2	21	GO:0044769;GO:0046961;GO:0036442	ATPase activity, coupled to transmembrane movement of ions, rotational mechanism	0.00290540156997757

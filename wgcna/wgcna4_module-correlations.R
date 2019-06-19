@@ -40,24 +40,41 @@ dim(datTraits)
 
 #format datTraits so it has only numeric values
 head(datTraits)
-datTraits = datTraits %>% 
+datTraits2 = datTraits %>% 
   mutate(RoomTemp = if_else(Temperature=='roomTemp',
                              1,
                              0),
          RoomTemp = ifelse(Ethanol == 'ethanol',
                             NA,
                             RoomTemp),
-         Ethanol = if_else(Ethanol == 'ethanol',
+         Etoh = if_else(Ethanol == 'ethanol',
                            1,
                            0),
-         Ethanol = ifelse(Temperature=='roomTemp',
+         Etoh = ifelse(Temperature=='roomTemp',
                            NA,
-                           Ethanol),
+                           Etoh),
          Mutant = if_else(Genotype=='mutant',
                           1,
-                          0)
-  ) 
-head(datTraits)
+                          0),
+         RtMut = RoomTemp,
+         RtMut = ifelse(Genotype == 'het_wt',
+                        NA,
+                        RtMut),
+         RtWt = RoomTemp,
+         RtWt = ifelse(Genotype == 'mutant',
+                       NA,
+                       RtWt),
+         EtohMut = Etoh,
+         EtohMut = ifelse(Genotype == 'het_wt',
+                          NA,
+                          EtohMut),
+         EtohWt = Etoh,
+         EtohWt = ifelse(Genotype == 'mutant',
+                         NA,
+                         EtohWt)
+  ) %>% 
+  select(RoomTemp, RtMut, RtWt, Etoh, EtohMut, EtohWt, Mutant, Batch)
+head(datTraits2)
 
 
 #=====================================================================================
@@ -78,15 +95,15 @@ nSamples = nrow(datExpr);
 MEs0 = moduleEigengenes(datExpr, moduleColors)$eigengenes
 MEs = orderMEs(MEs0)
 #use the cor() function to get the correlations between the module eigengenes and the trait data
-moduleTraitCor = cor(MEs, datTraits, use = "p");
+moduleTraitCor = cor(MEs, datTraits2, use = "p");
 #get p values as well
 moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 
 
 #write out module loadings
 mEigs=MEs
-rownames(mEigs) = rownames(datTraits)
-save(mEigs, file='moduleEigengenes.Rdata')
+rownames(mEigs) = rownames(datTraits2)
+# save(mEigs, file='moduleEigengenes.Rdata')
 
 #=====================================================================================
 #
@@ -125,7 +142,7 @@ sub.colors = substr(rownames(moduleTraitCor), 3, 50) #trim away the ME from the
 module.sizes = paste(sub.colors, table(moduleColors)[sub.colors], sep = "\n")
 
 labeledHeatmap(Matrix = moduleTraitCor,
-               xLabels = names(datTraits),
+               xLabels = names(datTraits2),
                yLabels = rownames(moduleTraitCor),
                ySymbols = module.sizes,
                colorLabels = FALSE,
@@ -137,6 +154,29 @@ labeledHeatmap(Matrix = moduleTraitCor,
                main = paste("Module-trait relationships"))
 
 
+
+# build GO_MWU inputs -----------------------------------------------------
+
+geneModuleMembership = as.data.frame(cor(datExpr, MEs, use = "p"));
+modules = sub('ME', '', colnames(geneModuleMembership))
+genes = rownames(geneModuleMembership)
+inputFiles=c()
+
+for (m in modules){
+  moduleGenes = genes[moduleColors==m]
+  godf = data.frame(gene=genes,
+                    inMod=if_else(genes %in% moduleGenes,
+                                  1,
+                                  0))
+  outname = paste(c('./wgcna/go_mwu/', m, '_moduleInput.csv'), collapse='')
+  print(paste('module = ', m))
+  print(paste('total genes =', length(moduleGenes)))
+  write.csv(godf, file=outname, row.names=F, quote=F)
+  inputFiles = append(inputFiles, paste(m, '_moduleInput.csv', sep=''))
+}
+
+save(inputFiles, file='./wgcna/go_mwu/moduleInputFiles.Rdata')
+  
 
 #-------- replot the heatmap after subsetting for modules that are significant for your trait of interest--------
 #select a significance cutoff (CUT) and the trait you are interested in (TRAIT)
@@ -167,7 +207,7 @@ blueWhiteRed(50)
 
 
 labeledHeatmap(Matrix = subCor,
-               xLabels = names(datTraits),
+               xLabels = names(datTraits2),
                yLabels = rownames(subCor),
                ySymbols = module.sizes,
                colorLabels = FALSE,
@@ -208,8 +248,8 @@ abline(h=0.25, lty=2)
 #of as a hub gene, (ie it's variation in expression across the samples is most exemplary 
 #of the module)
 
-# Define dataframe trait.df containing the a trait of interest from datTraits
-trait.df = as.data.frame(datTraits[,TRAIT]);
+# Define dataframe trait.df containing the a trait of interest from datTraits2
+trait.df = as.data.frame(datTraits2[,TRAIT]);
 names(trait.df) = TRAIT
 # names (colors) of the modules
 modNames = substring(names(MEs), 3)
@@ -374,17 +414,17 @@ lnames=load("datasets/raw_rld.Rdata")
 head(rld.df)
 
 #select for this module
-x=rld.df[rownames(rld.df) %in% moduleGenes, colnames(rld.df) %in% rownames(datTraits)]
+x=rld.df[rownames(rld.df) %in% moduleGenes, colnames(rld.df) %in% rownames(datTraits2)]
 dim(x)
 length(moduleGenes)
 head(x)
-sum(colnames(x) == rownames(datTraits)) == ncol(x)
+sum(colnames(x) == rownames(datTraits2)) == ncol(x)
 
 
 #sort the dataframe by ethanol treatment, and time
-datTraits$ordTime = as.numeric(as.character(datTraits$time))
-y=datTraits[with(datTraits, order(ordTime, ethanol)), ]
-y=datTraits[with(datTraits, order(ethanol, ordTime)), ]
+datTraits2$ordTime = as.numeric(as.character(datTraits2$time))
+y=datTraits2[with(datTraits2, order(ordTime, ethanol)), ]
+y=datTraits2[with(datTraits2, order(ethanol, ordTime)), ]
 # y=y[y$time==2,]
 x=x[,rownames(y)]
 colnames(x)

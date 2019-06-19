@@ -27,9 +27,9 @@ input = "tempForGO.csv"
 goAnnotations="zebrafish_embl_go.tsv" # two-column, tab-delimited, one line per gene, multiple GO terms separated by semicolon. If you have multiple lines per gene, use nrify_GOtable.pl prior to running this script.
 goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ontology.shtml
 
-goDivision="CC";SMALLEST=5
-goDivision="MF";SMALLEST=5
-goDivision="BP";SMALLEST=50
+goDivision="CC";SMALLEST=30
+goDivision="MF";SMALLEST=30
+goDivision="BP";SMALLEST=100
 
 source("gomwu.functions.R")
 

@@ -1,0 +1,4 @@
+delta.rank	pval	level	nseqs	term	name	p.adj
+0	8.77435605012085e-4	2	14	GO:0033178	proton-transporting two-sector ATPase complex, catalytic domain	0.0941780882712971
+0	6.77558696944155e-8	3	235	GO:0044429	mitochondrial part	2.18173900416018e-5
+0	5.6275137722673e-4	4	49	GO:0044455	mitochondrial membrane part	0.0906029717335035
