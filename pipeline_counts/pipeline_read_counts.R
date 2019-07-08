@@ -37,6 +37,11 @@ order = sdat %>%
 sdat$Run = factor(sdat$Run, levels=order)
 
 
+#get table of results
+sdat %>% 
+  group_by(stat) %>% 
+  summarize(`Mean(million)`=mean(value)/1e6) %>% 
+  write_tsv('pipeline_counts/summary_table.tsv')
 
 #plot full barplot
 bp<-sdat %>% 
