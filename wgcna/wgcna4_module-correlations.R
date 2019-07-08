@@ -73,7 +73,7 @@ datTraits2 = datTraits %>%
                          NA,
                          EtohWt)
   ) %>% 
-  select(RoomTemp, RtMut, RtWt, Etoh, EtohMut, EtohWt, Mutant, Batch)
+  dplyr::select(RoomTemp, RtMut, RtWt, Etoh, EtohMut, EtohWt, Mutant, Batch)
 head(datTraits2)
 
 
@@ -176,6 +176,48 @@ for (m in modules){
 }
 
 save(inputFiles, file='./wgcna/go_mwu/moduleInputFiles.Rdata')
+
+
+
+# check for whether red genes in mut_vs_wthet are in mods -----------------
+
+#upload the mutWt log2 data, filter for red genes, and merge with module colors
+
+#prep geneModuleMembership
+geneModuleMembership$ensembl_gene_id = genes
+geneModuleMembership$assignedModule = moduleColors
+geneModuleMembership$maxMemb = apply(geneModuleMembership[,grep('ME', colnames(geneModuleMembership))], 1, max)
+
+#merge in 
+ndat = read_tsv('deseq/mutWt.tsv') %>% 
+  left_join(geneModuleMembership, by='ensembl_gene_id')
+
+
+#build barplot
+nbpdat = ndat %>% 
+  group_by(assignedModule) %>% 
+  summarize(nDiff = sum(different),
+            tot=n(),
+            prop=nDiff/tot) %>% 
+  filter(prop > 0)
+  
+nbpdat %>% 
+  ggplot(aes(x=assignedModule, y=prop*100, fill=assignedModule)) +
+  geom_bar(stat='identity') +
+  scale_fill_manual(values=nbpdat$assignedModule) +
+  labs(y='Percentage of module', x='Module') +
+  theme(legend.position='none')
+
+#look at navajowhite2
+ndat %>% 
+  filter(different,
+         assignedModule=='navajowhite2') %>% 
+  view()
+
+#write out hits
+ndat %>% 
+  filter(different) %>% 
+  write_tsv(path='wgcna/redMutHet_module_joined.tsv')
   
 
 #-------- replot the heatmap after subsetting for modules that are significant for your trait of interest--------

@@ -1,7 +1,6 @@
 #zebrafish_RNAseq_functions.R
 library(genefilter)
 library(ggplot2)
-df=data.frame(e.res)
 write_out_go = function(df, outPath){
   go = data.frame(df) %>% 
     mutate(gene=rownames(df),

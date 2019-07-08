@@ -32,7 +32,7 @@ sig[grep(searchString, sig$name),]
 go="GO:0004984" #olfactory receptor activity
 go='GO:0004930' #G-protein coupled receptor activity
 go='GO:0007409;GO:0048812' #neuron projection morphogenesis
-go='GO:0043009;GO:0009792;GO:0009790'
+go='GO:0043009;GO:0009792;GO:0009790' #embryo development
 
 #subset for that GO term
 go.genes = gene.res[gene.res$term == go, 'seq']
@@ -62,4 +62,10 @@ geneSet = mdat$ensembl_gene_id
 #check the log2 values match expectation from heatmap
 mdat %>% 
   ggplot(aes(y=log2FoldChange)) +
-  geom_boxplot()
+  geom_boxplot() +labs(title='Brown module')
+
+
+
+mdat %>% 
+  write_tsv(path='~/Desktop/brownModule_BP_embryDevelopment_genes.tsv')
+
