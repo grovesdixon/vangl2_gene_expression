@@ -51,9 +51,9 @@ gomwuStats(input, goDatabase, goAnnotations, goDivision,
 quartz()
 gomwuPlot(input,goAnnotations,goDivision,
 	absValue=-log(0.05,10),  # genes with the measure value exceeding this will be counted as "good genes". Specify absValue=0.001 if you are doing Fisher's exact test for standard GO enrichment or analyzing a WGCNA module (all non-zero genes = "good genes").
-	level1=0.05, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
-	level2=0.01, # FDR cutoff to print in regular (not italic) font.
-	level3=0.001, # FDR cutoff to print in large bold font.
+	level1=0.01, # FDR threshold for plotting. Specify level1=1 to plot all GO categories containing genes exceeding the absValue.
+	level2=0.001, # FDR cutoff to print in regular (not italic) font.
+	level3=0.0001, # FDR cutoff to print in large bold font.
 	txtsize=1.2,    # decrease to fit more on one page, or increase (after rescaling the plot so the tree fits the text) for better "word cloud" effect
 	treeHeight=0.5, # height of the hierarchical clustering tree
 #	colors=c("dodgerblue2","firebrick1","skyblue","lightcoral") # these are default colors, un-remar and change if needed

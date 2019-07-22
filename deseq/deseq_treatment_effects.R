@@ -31,7 +31,7 @@ resultsNames(dds)
 e.res = results(dds, contrast = c('Ethanol', 'ethanol', 'control'), independentFiltering=INDEPDENDENT_FILTERING)
 t.res = results(dds, contrast = c('Temperature', 'roomTemp', 'incubator'), independentFiltering=INDEPDENDENT_FILTERING)
 m.res = results(dds, contrast = c('Genotype', 'mutant', 'het_wt'), independentFiltering=INDEPDENDENT_FILTERING)
-i.res = results(dds, name='Ethanolethanol.Genotypemutatnt', independentFiltering=INDEPDENDENT_FILTERING)
+i.res = results(dds, name="Ethanolethanol.Genotypemutant", independentFiltering=INDEPDENDENT_FILTERING)
 
 
 #VOLCANO PLOTS
@@ -40,27 +40,43 @@ res=t.res;TITLE='Temperature effect'
 res=m.res;TITLE='Genotype effect'
 res=i.res;TITLE='Ethanol:Genotype interaction'
 
-sdf = data.frame(res) %>% 
-  arrange(pvalue) %>% 
-  mutate(sig = !is.na(padj) & padj < 0.1) %>% 
-  as_tibble()
-sdf
+
+ev=volcano_from_deseq_res(e.res, 'Ethanol effect')
+tv=volcano_from_deseq_res(t.res, 'Temperature effect')
+gv=volcano_from_deseq_res(m.res, 'Genotype effect')
+iv=volcano_from_deseq_res(i.res, 'Ethanol:Genotype interaction')
+legend <- cowplot::get_legend(ev+theme(legend.position='top'))
+lplt = plot_grid(legend)
+
+pltList=list(ev,tv,gv,iv)
+modVolcs = function(x){
+  x= x + theme(
+    axis.title.x=element_blank(),
+    # axis.text.x=element_blank(),
+    # axis.ticks.x=element_blank(),
+    axis.title.y=element_blank(),
+    # axis.text.y=element_blank(),
+    # axis.ticks.y=element_blank(),
+    legend.position='none')
+  return(x)
+}
+mList = lapply(pltList, function(x) modVolcs(x))
 
 
-g=ggplot(data=sdf, aes(x=log2FoldChange, y=-log(pvalue, 10), color=sig)) +
-	geom_point(alpha=0.1) +
-	scale_color_manual(values=c('black', 'red')) + 
-	labs(subtitle=TITLE,
-	     y=bquote(-log[10]~pvalue),
-	     x=bquote(log[2]~fold~difference)) +
-  lims(y=c(0,35))
-plot(g)
+#build multipanel
+ylab = ggdraw() + draw_label(bquote(-log[10]~pvalue), angle=90)
+plts=plot_grid(plotlist = mList)
+ylabPlts = plot_grid(ylab, plts, nrow=1, rel_widths=c(0.05, 1))
+top = plot_grid(lplt, ylabPlts, nrow=2, rel_heights=c(0.1, 1))
+xlab = plot_grid(ggdraw() + draw_label(bquote(log[2]~fold~difference)))
+plot_grid(top, xlab, nrow=2, rel_heights=c(1, 0.05))
 
 
 
 
 res.eth = e.res
 save(dds, res.eth, file='deseq/ethanol_results.Rdata')
+save(e.res, t.res, m.res, i.res, file='deseq/all_res.Rdata')
 write.table(e.res, file='deseq/ethanol_results.tsv', quote=F, sep='\t')
 write.table(t.res, file='deseq/temperature_results.tsv', quote=F, sep='\t')
 write.table(m.res, file='deseq/genotype_results.tsv', quote=F, sep='\t')

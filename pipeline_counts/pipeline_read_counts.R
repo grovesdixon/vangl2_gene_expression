@@ -45,7 +45,7 @@ sdat %>%
 
 #plot full barplot
 bp<-sdat %>% 
-  ggplot(aes(x=stat, y=value, color=Run, fill=Run)) +
+  ggplot(aes(x=stat, y=value, color=ethanol, fill=ethanol, group=Run)) +
     geom_bar(stat='identity', position='dodge') +
     labs(y='Read count', x='Pipeline step') +
     theme(axis.text.x=element_text(angle=20, vjust=0.75))
@@ -64,7 +64,7 @@ histMeans = gc %>%
   labs(x='Mean gene counted reads accross projects')
 
 rankedMeans = gc %>% 
-  ggplot(aes(x=stat, y=value, color=Run, fill=Run, group=Run)) +
+  ggplot(aes(x=stat, y=value, color=ethanol, fill=ethanol, group=Run)) +
   geom_bar(stat='identity', position='dodge') +
   labs(y='Read count', x='Pipeline step', title='Mean Counts')
 rankedMeans
@@ -74,7 +74,7 @@ plot_grid(histMeans, rankedMeans, nrow=1, rel_widths=c(.5,1))
 #plot scatter abs
 quartz()
 lp<-sdat %>% 
-  ggplot(aes(x=stat, y=value, color=Run)) +
+  ggplot(aes(x=stat, y=value, color=ethanol, group=Run)) +
   geom_point() +
   geom_line(aes(group=Run)) +
   theme(legend.position='none', axis.text.x=element_text(angle=20, vjust=0.75)) +
@@ -85,13 +85,21 @@ lp<-sdat %>%
 pp<-sdat %>% 
   group_by(Run) %>% 
   mutate(prop=value/max(value)) %>% 
-  ggplot(aes(x=stat, y=prop, color=Run)) +
+  ggplot(aes(x=stat, y=prop, color=ethanol, group=Run)) +
     geom_point() +
     geom_line(aes(group=Run)) +
     labs(y='Proportion raw reads', x='Pipeline step', subtitle='read proportions') +
-    theme(legend.position='none', axis.text.x=element_text(angle=20, vjust=0.75))
+    theme(axis.text.x=element_text(angle=20, vjust=0.75))
 
-plot_grid(lp, pp)
+plot_grid(lp, pp, histMeans, rankedMeans, nrow=2, rel_widths=c(1,1.3))
+
+
+#PLOT ALL 4 TOGETHER
+plot_grid(lp, pp, )
+
+
+
+
 
 
 quartz()
