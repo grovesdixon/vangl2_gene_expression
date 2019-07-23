@@ -16,31 +16,28 @@ library(dplyr)
 library(DESeq2)
 
 # Import DESeq2 results to use
-setwd('./kegg_pathways/ethanol_results/')
-lnames = load('deseq/ethanol_results.Rdata')
+lnames = load('~/gitreps/vangl2_gene_expression/deseq/ethanol_results.Rdata');sigDir='~/gitreps/vangl2_gene_expression/kegg_pathways/sigOnly_ethanol_results/';normalDir='~/gitreps/vangl2_gene_expression/kegg_pathways/ethanol_results/'
+lnames = load('~/gitreps/vangl2_gene_expression/deseq/mutantOnly_ethanol_results.Rdata');sigDir = '~/gitreps/vangl2_gene_expression/kegg_pathways/mutOnly_sigOnly_ethanol_results/';normalDir='~/gitreps/vangl2_gene_expression/kegg_pathways/mutOnly_ethanol_results/'
 lnames
 res=res.eth
-
-
 
 #----- OPTIONALLY SWITCH TO SIGNIFICANT ONLY! -----#
 #Choose if you want to use significant genes only
 #If TRUE, then only significant genes will be color coded in pathway figures
 #If FALSE, then all genes with expression data will be color coded
-sigOnly=FALSE
+sigOnly=TRUE
 
 before = nrow(res)
 if (sigOnly){
-  setwd('./kegg_pathways/sig_only_results')
+  setwd(sigDir)
   print('RUNNGING FOR ONLY SIGNIFICANT GENES')
   res=res[!is.na(res$padj) & res$padj < 0.1,]
   after=nrow(res)
   print(paste(c('Building plots for', after, 'significant genes'), collapse=' '))
 } else{
-  setwd('./kegg_pathways/ethanol_results')
+  setwd(normalDir)
   print('Building pathways for all expressed genes')
 }
-setwd('./kegg_pathways/sigOnly_ethanol_results/')
 #--------------------------------------------------#
 
 #sort and summarize
@@ -83,8 +80,8 @@ library(gage)
 
 #the package gageData does not have the zebrafish Keggs, so they need to be done manually
 #upload zebrafish keggs retrieved from here: http://rest.kegg.jp/link/dre/pathway
-keggs = read.table("kegg_pathways/zebrafish_keggs.tsv", header = T, colClasses = c("character", "character")) #get this with KeggAPI (http://rest.kegg.jp/link/dre/pathway)
-keg.names = read.table("kegg_pathways/zebrafish_kegg_names.tsv", header = T, sep = "\t", colClasses=c("character", "character")) #get this with keggAPI (http://rest.kegg.jp/list/pathway/dre)
+keggs = read.table("~/gitreps/vangl2_gene_expression/kegg_pathways/zebrafish_keggs.tsv", header = T, colClasses = c("character", "character")) #get this with KeggAPI (http://rest.kegg.jp/link/dre/pathway)
+keg.names = read.table("~/gitreps/vangl2_gene_expression/kegg_pathways/zebrafish_kegg_names.tsv", header = T, sep = "\t", colClasses=c("character", "character")) #get this with keggAPI (http://rest.kegg.jp/list/pathway/dre)
 head(keggs)
 head(keg.names)
 #build the kegg list
@@ -125,9 +122,9 @@ keggresids
 
 #perform FDR and subset for significant
 #select whether you want to use adjusted or normal p values and the cutoff from printing out path figures
-p.type = 'p.val'
+# p.type = 'p.val'
 p.type = 'padj'
-CUT = 0.05
+CUT = 0.1
 
 
 head(keggres)
@@ -213,14 +210,15 @@ knames = c("Ribosome",
            "notch",
            "TGF-beta",
            "Neuroactive ligand-receptor interaction")
+d=data.frame('kegg'=keggresids, 'name'=knames)
+write.table(d, file='./keggsPlotted.tsv')
 
-
-#or load them individually
-keggresids = c("dre04340")  #Hedgehog
-knames = c('Hedgehod')      #Hedgehog
-
-keggresids = c("dre04310")  #wntPCP
-knames = c('Wnt')      #wntPCP
+# #or load them individually
+# keggresids = c("dre04340")  #Hedgehog
+# knames = c('Hedgehod')      #Hedgehog
+# 
+# keggresids = c("dre04310")  #wntPCP
+# knames = c('Wnt')      #wntPCP
 
 #run pathview as above
 dev.res = all[rownames(all) %in% keggresids,]
