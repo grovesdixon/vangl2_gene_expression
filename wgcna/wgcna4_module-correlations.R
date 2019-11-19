@@ -103,6 +103,7 @@ moduleTraitPvalue = corPvalueStudent(moduleTraitCor, nSamples);
 #write out module loadings
 mEigs=MEs
 rownames(mEigs) = rownames(datTraits2)
+
 # save(mEigs, file='moduleEigengenes.Rdata')
 
 #=====================================================================================
@@ -160,6 +161,13 @@ labeledHeatmap(Matrix = moduleTraitCor,
 geneModuleMembership = as.data.frame(cor(datExpr, MEs, use = "p"));
 modules = sub('ME', '', colnames(geneModuleMembership))
 genes = rownames(geneModuleMembership)
+
+#output the gene module membership
+modMemDat = geneModuleMembership
+modMemDat$assignment = moduleColors
+write.csv(modMemDat, file='wgcna/geneModuleMembership.csv', quote=FALSE)
+
+
 inputFiles=c()
 
 for (m in modules){
