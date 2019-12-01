@@ -25,7 +25,7 @@ res=res.eth
 #Choose if you want to use significant genes only
 #If TRUE, then only significant genes will be color coded in pathway figures
 #If FALSE, then all genes with expression data will be color coded
-sigOnly=TRUE
+sigOnly=FALSE
 
 before = nrow(res)
 if (sigOnly){
@@ -151,39 +151,6 @@ keggresids
 #detach dply
 detach("package:dplyr", unload=TRUE)
 
-# # Define plotting function for applying later
-# #set the directory where you want to output the results
-# plot_pathway = function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="dre", new.signature=FALSE)
-# 
-# 
-# 
-# # plot multiple pathways (plots saved to disk and returns a throwaway list object)
-# #default settings for testing:
-# tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="dre"))
-# write.table(sig.all, file="kegg_stats.tsv", sep = "\t", quote = F) #write out the results
-# 
-# #plot pngs
-# #modified
-# LOW='dodgerblue'
-# MID='grey'
-# HIGH='red'
-# scale.limit=1
-# tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="dre", node.sum='sum', low= LOW, mid=MID, high=HIGH, limit=list(gene=scale.limit,cpd=scale.limit), kegg.native=TRUE))
-# 
-# #OUTPUT A SELECTED SET OF KEGG PATHWAYS
-# Ribosome  = dre03010
-# Apoptosis = dre04210
-# Wnt       = dre04310 
-# Hedgehod  = dre04340
-# PI3K/AKT  = dre04151
-
-# mTOR signaling pathway (dre04150)
-# oxidative phosphorylation (dre00190)
-# DNA replication (dre03030)
-# cell cycle (dre04110)
-# p53 signaling (dre04115)
-# notch signaling (dre04330) 
-# TGF-beta signaling (dre04340)
 
 #enter as vectors
 keggresids=c('dre03010',

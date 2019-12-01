@@ -137,7 +137,7 @@ write.gomwu.input = function(dat, out.name){
 
 merge_gene_names = function(dat, col=F, sort.column=F){
 	library("biomaRt")
-	if(col){
+	if(col!=FALSE){
 		geneSet=dat[,col]
 	}
 	else{
