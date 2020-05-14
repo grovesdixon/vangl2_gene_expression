@@ -1,17 +1,28 @@
 #RNA-seq data processing for vangl2 data
 #3-19-19
 
-########################################
-#### DOWNLOAD READS FROM BASE-SPACE ####
-########################################
+#########################################
+###### COPY READS OVER FROM BACKUP ######
+#########################################
 #(see downloading_NGS_data_from_GSAF.txt for more on this)
-bs download project -i 122413294 -o JA19052_download
+scp -r grovesd@ranch.tacc.utexas.edu:/stornext/ranch_01/ranch/users/02260/grovesd/raw_sequence_reads/alfireEthanolZebrafish_experiment2 .
+
+##NOTE! The two subdirectories have matching fastq file names
+#if you move these into single directory they will overwrite!
+
 
 #move fastqs into single directory
-mkdir fastqs
-for dir in ls -d JA19052_download/*/
-do echo "mv ${dir}*.gz fastqs/"
+mkdir SA19014_fastqs
+for dir in ls -d SA19014/*/
+do echo "mv ${dir}*.gz SA19014_fastqs/"
 done
+
+#move fastqs into single directory
+mkdir SA19019_fastqs
+for dir in ls -d SA19019/*/
+do echo "mv ${dir}*.gz SA19019_fastqs/"
+done
+
 
 
 #check reads

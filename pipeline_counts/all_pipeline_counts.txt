@@ -71,7 +71,6 @@ RTCW-3	19736304	dedupPropPair
 RTCW-4	17409798	dedupPropPair
 RTCW-5	19741452	dedupPropPair
 RTCW-6	16116368	dedupPropPair
-RTCW-6	16116368	dedupPropPair
 ICM-1	0.315759	dupRemProp
 ICM-2	0.292133	dupRemProp
 ICM-3	0.159011	dupRemProp

@@ -1,6 +1,10 @@
-#zebrafish_RNAseq_functions.R
+#rnaseq_functions.R
 library(genefilter)
 library(ggplot2)
+library(tidyverse)
+library(cowplot)
+theme_set(theme_cowplot())
+
 write_out_go = function(df, outPath){
   go = data.frame(df) %>% 
     mutate(gene=rownames(df),

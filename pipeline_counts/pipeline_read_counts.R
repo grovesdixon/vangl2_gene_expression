@@ -95,32 +95,16 @@ plot_grid(lp, pp, histMeans, rankedMeans, nrow=2, rel_widths=c(1,1.3))
 
 
 #PLOT ALL 4 TOGETHER
-plot_grid(lp, pp, )
-
-
-
-
-
-
-quartz()
-lp = sdat %>% 
-  filter(stat %in% c("rawCounts", "trimmedCounts", "predupMapped", "dedupMapped", "geneCounted")) %>% 
-  mutate(stat=factor(stat, levels=c("rawCounts", "trimmedCounts", "predupMapped", "dedupMapped", "geneCounted"))) %>% 
-  ggplot(aes(x=stat, y=fixValue, color=my_title)) +
-  geom_point() +
-  geom_line(aes(group=Run)) +
-  theme(legend.position='none', axis.text.x=element_text(angle=20, vjust=0.75)) +
-  labs(y='Read count', x='Pipeline step', subtitle='read counts')
-
-
-pp<-sdat %>% 
-  filter(stat %in% c("rawCounts", "trimmedCounts", "predupMapped", "dedupMapped", "geneCounted")) %>% 
-  mutate(stat=factor(stat, levels=c("rawCounts", "trimmedCounts", "predupMapped", "dedupMapped", "geneCounted"))) %>% 
-  group_by(Run) %>% 
-  mutate(prop = fixValue/max(fixValue) ) %>% 
-  ggplot(aes(x=stat, y=prop, color=my_title)) +
-    geom_point() +
-    geom_line(aes(group=Run)) +
-    labs(y='Proportion raw reads', x='Pipeline step', subtitle='read proportions') +
-    theme(legend.position='none', axis.text.x=element_text(angle=20, vjust=0.75))
 plot_grid(lp, pp)
+
+
+#look at stats
+mean_raw = sdat %>% 
+  filter(stat=='rawCounts') %>% 
+  pull(value) %>% 
+  mean()
+sdat %>% 
+  group_by(stat) %>% 
+  summarize(mean_prop = mean(value)/mean_raw)
+
+
