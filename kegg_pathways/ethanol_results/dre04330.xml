@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE pathway SYSTEM "http://www.kegg.jp/kegg/xml/KGML_v0.7.2_.dtd">
-<!-- Creation date: Aug 7, 2019 13:57:25 +0900 (GMT+9) -->
+<!-- Creation date: Aug 15, 2019 10:58:06 +0900 (GMT+9) -->
 <pathway name="path:dre04330" org="dre" number="04330"
          title="Notch signaling pathway"
          image="http://www.kegg.jp/kegg/pathway/dre/dre04330.png"
@@ -58,12 +58,12 @@
     <entry id="19" name="ko:K06056" type="ortholog"
         link="http://www.kegg.jp/dbget-bin/www_bget?K06056">
         <graphics name="K06056" fgcolor="#000000" bgcolor="#FFFFFF"
-             type="rectangle" x="810" y="234" width="46" height="17"/>
+             type="rectangle" x="810" y="247" width="46" height="17"/>
     </entry>
-    <entry id="20" name="dre:100534909 dre:140613 dre:30288 dre:359836 dre:402914" type="gene"
-        link="http://www.kegg.jp/dbget-bin/www_bget?dre:100534909+dre:140613+dre:30288+dre:359836+dre:402914">
-        <graphics name="her15.1..." fgcolor="#000000" bgcolor="#BFFFBF"
-             type="rectangle" x="810" y="205" width="46" height="17"/>
+    <entry id="20" name="dre:100148329 dre:100149066 dre:100534909 dre:140613 dre:30288 dre:30300 dre:359836 dre:402914" type="gene"
+        link="http://www.kegg.jp/dbget-bin/www_bget?dre:100148329+dre:100149066+dre:100534909+dre:140613+dre:30288+dre:30300+dre:359836+dre:402914">
+        <graphics name="her4.2..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="810" y="193" width="46" height="17"/>
     </entry>
     <entry id="21" name="dre:386772 dre:503870 dre:563306" type="gene"
         link="http://www.kegg.jp/dbget-bin/www_bget?dre:386772+dre:503870+dre:563306">
@@ -95,9 +95,9 @@
         <graphics name="psenen" fgcolor="#000000" bgcolor="#BFFFBF"
              type="rectangle" x="263" y="273" width="46" height="17"/>
     </entry>
-    <entry id="27" name="dre:101885597 dre:334026 dre:393500 dre:568626 dre:570481" type="gene"
-        link="http://www.kegg.jp/dbget-bin/www_bget?dre:101885597+dre:334026+dre:393500+dre:568626+dre:570481">
-        <graphics name="dtx1..." fgcolor="#000000" bgcolor="#BFFFBF"
+    <entry id="27" name="dre:100037355 dre:100144568 dre:101885597 dre:334026 dre:393500 dre:568626 dre:570481" type="gene"
+        link="http://www.kegg.jp/dbget-bin/www_bget?dre:100037355+dre:100144568+dre:101885597+dre:334026+dre:393500+dre:568626+dre:570481">
+        <graphics name="dtx4..." fgcolor="#000000" bgcolor="#BFFFBF"
              type="rectangle" x="333" y="194" width="46" height="17"/>
     </entry>
     <entry id="28" name="dre:497616 dre:692064" type="gene"
@@ -140,7 +140,12 @@
         <graphics name="101886356..." fgcolor="#000000" bgcolor="#BFFFBF"
              type="rectangle" x="715" y="325" width="46" height="17"/>
     </entry>
-    <entry id="60" name="undefined" type="group">
+    <entry id="60" name="dre:335134 dre:58008 dre:58146" type="gene"
+        link="http://www.kegg.jp/dbget-bin/www_bget?dre:335134+dre:58008+dre:58146">
+        <graphics name="heyl..." fgcolor="#000000" bgcolor="#BFFFBF"
+             type="rectangle" x="810" y="220" width="46" height="17"/>
+    </entry>
+    <entry id="61" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
              type="rectangle" x="286" y="281" width="92" height="34"/>
         <component id="10"/>
@@ -148,25 +153,25 @@
         <component id="26"/>
         <component id="9"/>
     </entry>
-    <entry id="61" name="undefined" type="group">
+    <entry id="62" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
              type="rectangle" x="608" y="180" width="46" height="34"/>
         <component id="23"/>
         <component id="24"/>
     </entry>
-    <entry id="62" name="undefined" type="group">
+    <entry id="63" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
              type="rectangle" x="629" y="313" width="113" height="40"/>
         <component id="13"/>
         <component id="16"/>
     </entry>
-    <entry id="63" name="undefined" type="group">
+    <entry id="64" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
              type="rectangle" x="654" y="313" width="63" height="40"/>
         <component id="13"/>
         <component id="15"/>
     </entry>
-    <entry id="64" name="undefined" type="group">
+    <entry id="65" name="undefined" type="group">
         <graphics fgcolor="#000000" bgcolor="#FFFFFF"
              type="rectangle" x="685" y="302" width="90" height="63"/>
         <component id="13"/>
@@ -182,7 +187,7 @@
     <relation entry1="25" entry2="30" type="PPrel">
         <subtype name="activation" value="--&gt;"/>
     </relation>
-    <relation entry1="60" entry2="30" type="PPrel">
+    <relation entry1="61" entry2="30" type="PPrel">
         <subtype name="activation" value="--&gt;"/>
     </relation>
     <relation entry1="33" entry2="30" type="PPrel">
@@ -191,7 +196,7 @@
     <relation entry1="30" entry2="21" type="PPrel">
         <subtype name="activation" value="--&gt;"/>
     </relation>
-    <relation entry1="61" entry2="21" type="PPrel">
+    <relation entry1="62" entry2="21" type="PPrel">
         <subtype name="activation" value="--&gt;"/>
     </relation>
     <relation entry1="21" entry2="20" type="GErel">
@@ -206,13 +211,13 @@
     <relation entry1="28" entry2="30" type="PPrel">
         <subtype name="inhibition" value="--|"/>
     </relation>
-    <relation entry1="62" entry2="21" type="PPrel">
-        <subtype name="inhibition" value="--|"/>
-    </relation>
     <relation entry1="63" entry2="21" type="PPrel">
         <subtype name="inhibition" value="--|"/>
     </relation>
     <relation entry1="64" entry2="21" type="PPrel">
+        <subtype name="inhibition" value="--|"/>
+    </relation>
+    <relation entry1="65" entry2="21" type="PPrel">
         <subtype name="inhibition" value="--|"/>
     </relation>
     <relation entry1="21" entry2="22" type="PPrel">
@@ -220,5 +225,8 @@
     </relation>
     <relation entry1="59" entry2="21" type="PPrel">
         <subtype name="inhibition" value="--|"/>
+    </relation>
+    <relation entry1="21" entry2="60" type="GErel">
+        <subtype name="expression" value="--&gt;"/>
     </relation>
 </pathway>

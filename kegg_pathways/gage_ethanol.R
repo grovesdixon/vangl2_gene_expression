@@ -220,6 +220,25 @@ tmp = sapply(keggresids,
 #plot pngs
 tmp = sapply(keggresids, function(pid) pathview(gene.data=foldchanges, pathway.id=pid, species="dre", node.sum= NODE.SUM, low= LOW, mid=MID, high=HIGH, limit=list(gene=scale.limit,cpd=scale.limit), kegg.native=TRUE))
 
+# assemble keggs and genes for checking -----------------------------------
+library(tidyverse)
+#assemble a single dataframe
+kegg_vector =  unlist(kegg.sets.dr[keggresids])
+gene_df = data.frame('kegg' = names(kegg_vector),
+                     'entrez' = kegg_vector) %>% 
+  dplyr::inner_join(data.frame(res), by = 'entrez') %>% 
+  as_tibble()
+
+
+# look for a particular gene --------------------------------------------------
+
+#kegg subset
+my_kegg = 'dre04310'
+kdat = gene_df %>% 
+  dplyr::filter(kegg==my_kegg)
+kdat
+
+
 
 #view genes associated with the KEGGS
 head(kegg.sets.dr)
@@ -234,9 +253,4 @@ targetResults = keggResults[keggResults$symbol==target.gene,]
 targetResults
 
 
-library(tidyverse)
-keggResults %>% 
-  filter(grepl('rac', symbol))
 
-keggResults[grepl('rac', keggResults$symbol),] %>% 
-  write_tsv(path='~/junk/racs.tsv')

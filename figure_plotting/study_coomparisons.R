@@ -2,7 +2,9 @@
 source('rnaseq_functions.R')
 library(tidyverse)
 library(cowplot)
+theme_set(theme_cowplot())
 
+#function to prepare deseq results file for plotting
 prep_res = function(res){
   x=data.frame(res)
   x$gene=rownames(res)
@@ -10,14 +12,14 @@ prep_res = function(res){
 }
 
 
-#LOAD ETHANOL RESULTS FOR THIS STUDY
+#LOAD ETHANOL RESULTS FOR THIS STUDY (vangl2 rnaseq)
 ll=load('deseq/ethanol_results.Rdata')
 ll
 new=prep_res(res.eth)
 
 
-#LOAD RESULTS FROM PREVIOUS STUDY
-#for full dataset
+#LOAD RESULTS FROM PREVIOUS STUDY (wildtype rnaseq)
+#for full dataset (all timepoints together)
 ll=load('~/gitreps/Drerio_early_ethanol_RNAseq/deseq/ethanol_full_LRT_results.Rdata')
 ll
 #8 hour
@@ -32,7 +34,7 @@ ll
 
 
 
-
+#organize subsets of previous study and labels into lists
 oldRes = list(res.eth, res.e, res.t, res.f)
 oldf = lapply(oldRes, function(x) prep_res(x) %>% left_join(new, by = 'gene'))
 names = c('Full', '8hr', '10hr', '14hr')
@@ -42,6 +44,7 @@ ylabs = c('Old Full Ethanol',
           'Old 14 hr Ethanol')
 xlab = 'New Full Ethanol'
 
+#function to build scatterplot
 do_scatter = function(x, xlab, ylab, main){
   lm1=lm(x$log2FoldChange.y~x$log2FoldChange.x)
   print(summary(lm1))
@@ -56,6 +59,8 @@ do_scatter = function(x, xlab, ylab, main){
     
 }
 
+
+#plot them
 pltList = list()
 for (i in 1:length(oldf)){
   main=names[i]
@@ -98,7 +103,7 @@ head(sx2)
 sx2 %>% 
   write_csv(path='~/Desktop/oldVnew10hrEthanol.csv')
 
-#build plot
+#build plot with signiciance combinations color coded
 x %>% 
   filter(!is.na(significant)) %>% 
   ggplot(aes(x=log2FoldChange.x, y=log2FoldChange.y,
@@ -125,7 +130,7 @@ x %>%
              pch=21)
 
 
-#build plot
+#build plot highlighting genes signficant in both
 x %>% 
   filter(!is.na(significant)) %>% 
   mutate(`Both significant`=if_else(significant=='both',
@@ -146,4 +151,42 @@ x %>%
 
 
 
+# compare with WGCNA ------------------------------------------------------
+
+#isolate significance calls
+sdat = x %>% 
+  dplyr::select(gene, significant)
+
+#upload wgcna module membership values and merge with significance calls
+wdat = read.csv('wgcna/geneModuleMembership.csv') %>% 
+  rename(gene = X) %>% 
+  dplyr::select(gene, assignment) %>% 
+  tibble() %>% 
+  inner_join(sdat, by = 'gene')
+
+#plot amounts splits by module
+wdat %>% 
+  filter(!is.na(significant)) %>% 
+  ggplot(aes(x=assignment, fill=significant)) +
+  geom_bar()
+
+
+#plot proportion 'both'
+pdat = wdat %>% 
+  filter(!is.na(significant)) %>% 
+  group_by(assignment) %>% 
+  summarize(nboth = sum(significant == 'both'),
+            N = n()) %>% 
+  mutate(prop = nboth / N) %>% 
+  arrange(prop) 
+lvl_cols = unique(pdat$assignment)
+pdat$assignment = factor(pdat$assignment, levels = lvl_cols)
+pdat %>% 
+  ggplot(aes(x=assignment, y=prop, fill=assignment)) +
+  geom_bar(stat = 'identity') +
+  scale_fill_manual(values = as.character(lvl_cols)) +
+  labs(y='proportion of module',
+       x='module',
+       fill='module') +
+  coord_flip()
 
