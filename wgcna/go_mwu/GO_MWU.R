@@ -26,6 +26,7 @@ goDatabase="go.obo" # download from http://www.geneontology.org/GO.downloads.ont
 source("gomwu.functions.R")
 
 
+inputFiles = "darkseagreen3_moduleInput.csv"
 
 # run go_mwu for each -----------------------------------------------------
 
